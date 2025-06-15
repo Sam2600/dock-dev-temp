@@ -1,0 +1,16 @@
+# Ignore everything inside php/
+php/*
+
+# But keep specific files (negate the ignore)
+!php/PHP.Dockerfile
+!php/*.sh          # if you have shell scripts or similar
+!php/*.conf        # example if you have configs
+
+# (optional) Ignore other editor junk
+*.log
+*.swp
+*.DS_Store
+.idea/
+.vscode/
+
+.env

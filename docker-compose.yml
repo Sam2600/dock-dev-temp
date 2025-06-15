@@ -1,0 +1,53 @@
+version: "3.9"
+
+services:
+  nginx:
+    build:
+      context: ./nginx/
+      dockerfile: Nginx.Dockerfile
+    container_name: nginx
+    ports:
+      - "${NGINX_HOST_PORT}:${NGINX_CONTAINER_PORT}"
+    volumes:
+      - "./php/${PRJ_NAME}:/var/www/html/"
+    depends_on:
+      - php
+      - mysql
+    networks:
+      - app-network
+
+  php:
+    build:
+      context: ./php/
+      dockerfile: PHP.Dockerfile
+    container_name: php
+    expose:
+      - "${PHP_CONTAINER_PORT}"
+    volumes:
+      - "./php/${PRJ_NAME}:/var/www/html/"
+    depends_on:
+      - mysql
+    networks:
+      - app-network
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    environment:
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "${MYSQL_HOST_PORT}:${MYSQL_CONTAINER_PORT}"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - app-network
+
+volumes:
+  db_data:
+
+networks:
+  app-network:
+    driver: bridge

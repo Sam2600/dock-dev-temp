@@ -1,4 +1,7 @@
-FROM php:8.2.28-fpm as php
+ARG PHP_SUFIX=fpm
+ARG PHP_VERSION=8.2.28
+
+FROM php:${PHP_VERSION}-${PHP_SUFIX} as php
 
 # Create app user (let's name it wwwuser)
 RUN groupadd -g 1000 wwwgroup && \
@@ -19,15 +22,20 @@ RUN apt-get update && apt-get install -y \
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
+COPY ./scripts/entrypoint.sh /scripts/entrypoint.sh
+RUN chmod +x /scripts/entrypoint.sh
+
 # Set working directory
-WORKDIR /var/www/html
+ARG WORKDIR=/var/www/html
+WORKDIR ${WORKDIR}
 
 # Copy your app code (adjust as needed)
 # Copy cmd is only for production step
-# COPY C:\xampp\htdocs\MM-book-store-Backend /var/www/html/
 
 # Change ownership of working directory
-RUN chown -R wwwuser:wwwgroup /var/www/html
+RUN chown -R wwwuser:wwwgroup ${WORKDIR}
 
 # Switch to non-root user
 USER wwwuser
+
+ENTRYPOINT [ "/scripts/entrypoint.sh" ]

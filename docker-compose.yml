@@ -5,11 +5,16 @@ services:
     build:
       context: ./nginx/
       dockerfile: Nginx.Dockerfile
+      args:
+        - NGINX_VERSION=${NGINX_VERSION}
     container_name: nginx
-    ports:
-      - "${NGINX_HOST_PORT}:${NGINX_CONTAINER_PORT}"
     volumes:
-      - "./php/${PRJ_NAME}:/var/www/html/"
+      - "./php/${PRJ_NAME}:${APP_CODE_PATH_CONTAINER}"
+      - "${NGINX_SITES_PATH}:/etc/nginx/conf.d/"
+    ports:
+      - "${NGINX_HOST_HTTP_PORT}:80" # for web ui
+      - "88:88" # for web api
+      - "${NGINX_HOST_HTTPS_PORT}:443"
     depends_on:
       - php
       - mysql
@@ -20,18 +25,26 @@ services:
     build:
       context: ./php/
       dockerfile: PHP.Dockerfile
+      args:
+        - PHP_SUFIX=${PHP_SUFIX}
+        - PHP_VERSION=${PHP_VERSION}
+        - WORKDIR=${APP_CODE_PATH_CONTAINER}
     container_name: php
     expose:
-      - "${PHP_CONTAINER_PORT}"
+      - "9000" # Expose port for PHP-FPM
     volumes:
-      - "./php/${PRJ_NAME}:/var/www/html/"
+      - "./php/${PRJ_NAME}:${APP_CODE_PATH_CONTAINER}"
     depends_on:
       - mysql
     networks:
       - app-network
 
   mysql:
-    image: mysql:8.0
+    build:
+      context: ./mysql/
+      dockerfile: MySQL.Dockerfile
+      args:
+        - MYSQL_VERSION=${MYSQL_VERSION}
     container_name: mysql
     environment:
       MYSQL_USER: ${MYSQL_USER}
@@ -39,7 +52,7 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     ports:
-      - "${MYSQL_HOST_PORT}:${MYSQL_CONTAINER_PORT}"
+      - "${MYSQL_HOST_PORT}:3306"
     volumes:
       - db_data:/var/lib/mysql
     networks:

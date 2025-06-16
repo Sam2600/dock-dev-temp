@@ -1,2 +1,2 @@
-FROM nginx:1.28.0 as nginx
-COPY ./default.conf /etc/nginx/conf.d/default.conf
+ARG NGINX_VERSION=1.25.2
+FROM nginx:${NGINX_VERSION} as nginx

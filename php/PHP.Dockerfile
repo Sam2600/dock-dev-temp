@@ -1,36 +1,42 @@
-ARG PHP_SUFIX=fpm
+ARG PHP_SUFFIX=fpm
 ARG PHP_VERSION=8.2.28
 
-FROM php:${PHP_VERSION}-${PHP_SUFIX} as php
+FROM php:${PHP_VERSION}-${PHP_SUFFIX} as php
 
-# Create app user (let's name it wwwuser)
-RUN groupadd -g 1000 wwwgroup && \
-    useradd -u 1000 -g wwwgroup -s /bin/bash -m wwwuser
-
-# Install system dependencies for PHP extensions
-RUN apt-get update && apt-get install -y \
-    libicu-dev \
-    libzip-dev \
-    libonig-dev \
-    gettext \
-    zlib1g-dev \
-    libcurl4-openssl-dev \
-    && docker-php-ext-install intl curl fileinfo gettext mbstring exif pdo_mysql zip \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+# Install system dependencies and PHP extensions
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        libicu-dev \
+        libzip-dev \
+        libonig-dev \
+        gettext \
+        zlib1g-dev \
+        libcurl4-openssl-dev && \
+    docker-php-ext-install intl curl fileinfo gettext mbstring exif pdo_mysql zip && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
+# Create app user and group
+RUN groupadd -g 1000 wwwgroup && \
+    useradd -u 1000 -g wwwgroup -s /bin/bash -m wwwuser
+
+# Copy entrypoint script 
 COPY ./scripts/entrypoint.sh /scripts/entrypoint.sh
-RUN chmod +x /scripts/entrypoint.sh
+
+# Set permissions for script
+RUN sed -i 's/\r$//' /scripts/entrypoint.sh && \
+    chmod +x /scripts/entrypoint.sh
 
 # Set working directory
 ARG WORKDIR=/var/www/html
 WORKDIR ${WORKDIR}
 
 # Copy your app code (adjust as needed)
-# Copy cmd is only for production step
+ARG PRJ_NAME=my-coding-project
+COPY ./${PRJ_NAME} .
 
 # Change ownership of working directory
 RUN chown -R wwwuser:wwwgroup ${WORKDIR}

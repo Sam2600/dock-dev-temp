@@ -35,8 +35,8 @@ ARG WORKDIR=/var/www/html
 WORKDIR ${WORKDIR}
 
 # Copy your app code (adjust as needed)
-ARG PRJ_NAME=my-coding-project
-COPY ./${PRJ_NAME} .
+# ARG PRJ_NAME=my-coding-project
+# COPY ./${PRJ_NAME} .
 
 # Change ownership of working directory
 RUN chown -R wwwuser:wwwgroup ${WORKDIR}

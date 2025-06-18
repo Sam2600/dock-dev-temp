@@ -1,11 +1,30 @@
 version: "3.9"
 
 services:
+  nginx:
+    build:
+      context: ./nginx/
+      dockerfile: Nginx.prod.Dockerfile
+      args:
+        - NGINX_VERSION=${NGINX_VERSION}
+        - PRJ_NAME=${PRJ_NAME}
+        - APP_CODE_PATH_CONTAINER=${APP_CODE_PATH_CONTAINER}
+        - NGINX_SITES_PATH_PROD=${NGINX_SITES_PATH_PROD}
+    container_name: nginx
+    ports:
+      - "${NGINX_HOST_HTTP_PORT}:80" # for web ui
+      - "88:88" # for web api
+      - "${NGINX_HOST_HTTPS_PORT}:443"
+    depends_on:
+      - php
+      - mysql
+    networks:
+      - app-network
 
   php:
     build:
       context: ./php/
-      dockerfile: PHP.Dockerfile
+      dockerfile: PHP.prod.Dockerfile
       args:
         - PHP_SUFIX=${PHP_SUFIX}
         - PHP_VERSION=${PHP_VERSION}
@@ -14,3 +33,33 @@ services:
     container_name: php
     expose:
       - "9000" # Expose port for PHP-FPM
+    depends_on:
+      - mysql
+    networks:
+      - app-network
+
+  mysql:
+    build:
+      context: ./mysql/
+      dockerfile: MySQL.Dockerfile
+      args:
+        - MYSQL_VERSION=${MYSQL_VERSION}
+    container_name: mysql
+    environment:
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "${MYSQL_HOST_PORT}:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - app-network
+
+volumes:
+  db_data:
+
+networks:
+  app-network:
+    driver: bridge

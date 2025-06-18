@@ -24,11 +24,11 @@ RUN groupadd -g 1000 wwwgroup && \
     useradd -u 1000 -g wwwgroup -s /bin/bash -m wwwuser
 
 # Copy entrypoint script 
-COPY ./scripts/entrypoint.sh /scripts/entrypoint.sh
+COPY ./scripts/entrypoint.prod.sh /scripts/entrypoint.prod.sh
 
 # Set permissions for script
-RUN sed -i 's/\r$//' /scripts/entrypoint.sh && \
-    chmod +x /scripts/entrypoint.sh
+RUN sed -i 's/\r$//' /scripts/entrypoint.prod.sh && \
+    chmod +x /scripts/entrypoint.prod.sh
 
 # Set working directory
 ARG WORKDIR=/var/www/html
@@ -41,4 +41,4 @@ COPY --chown=wwwuser:wwwgroup ./${PRJ_NAME} .
 # Switch to non-root user
 USER wwwuser
 
-ENTRYPOINT [ "/scripts/entrypoint.sh" ]
+ENTRYPOINT [ "/scripts/entrypoint.prod.sh" ]

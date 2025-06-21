@@ -1,0 +1,47 @@
+services:
+  nginx:
+    image: "${NGINX_PUSHED_IMG}"
+    ports:
+      - "${NGINX_HOST_HTTP_PORT}:80" # for web ui
+      - "88:88" # for web api
+      - "${NGINX_HOST_HTTPS_PORT}:443"
+    container_name: nginx
+    networks:
+      - app-network
+    depends_on:
+      - php
+      - mysql
+
+  php:
+    image: "${PHP_PUSHED_IMG}"
+    container_name: php
+    environment:
+      - RUN_SEED=true
+    expose:
+      - "9000"
+    depends_on:
+      - mysql
+    networks:
+      - app-network
+
+  mysql:
+    image: "${MYSQL_PUSHED_IMG}"
+    environment:
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "${MYSQL_HOST_PORT}:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    container_name: mysql
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  db_data:

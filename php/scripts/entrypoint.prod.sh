@@ -1,7 +1,12 @@
 #!/bin/bash
 
+set -e
+
 if [ ! -f "vendor/autoload.php" ]; then
    composer install --no-ansi --no-dev --no-interaction --no-plugins --no-progress --no-scripts --optimize-autoloader
+   echo "Composer dependencies installed."
+else
+   echo "Vendor directory is found."
 fi
 
 if [ ! -f ".env" ]; then
@@ -13,23 +18,25 @@ fi
 
 # php artisan migrate
 php artisan optimize:clear
-php artisan migrate
 
-# Fix files ownership.
-chown -R wwwuser .
-chown -R wwwuser /app/storage
-chown -R wwwuser /app/storage/logs
-chown -R wwwuser /app/storage/framework
-chown -R wwwuser /app/storage/framework/sessions
-chown -R wwwuser /app/bootstrap
-chown -R wwwuser /app/bootstrap/cache
+# Only run migrate:fresh --seed if explicitly enabled
+if [ "$RUN_SEED" = "true" ]; then
 
-# Set correct permission.
-chmod -R 775 /app/storage
-chmod -R 775 /app/storage/logs
-chmod -R 775 /app/storage/framework
-chmod -R 775 /app/storage/framework/sessions
-chmod -R 775 /app/bootstrap
-chmod -R 775 /app/bootstrap/cache
+   echo "Waiting for MySQL to be ready..."
+
+   until nc -z -v -w30 mysql 3306; do
+      echo "⏳ Waiting for MySQL..."
+      sleep 3
+   done
+
+   echo "✅ MySQL is ready! Continuing..."
+
+   echo "Running migrations and seeding the database..."
+
+   php artisan migrate:fresh --seed
+   
+else
+   echo "Skipping migrations and seeding."
+fi
 
 exec php-fpm

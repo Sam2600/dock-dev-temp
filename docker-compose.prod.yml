@@ -31,6 +31,8 @@ services:
         - WORKDIR=${APP_CODE_PATH_CONTAINER}
         - PRJ_NAME=${PRJ_NAME}
     container_name: php
+    environment:
+      - RUN_SEED=true
     expose:
       - "9000" # Expose port for PHP-FPM
     depends_on:

@@ -6,6 +6,7 @@ FROM php:${PHP_VERSION}-${PHP_SUFFIX} as php
 # Install system dependencies and PHP extensions
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
+        netcat-openbsd \
         libicu-dev \
         libzip-dev \
         libonig-dev \

@@ -1,19 +1,6 @@
-version: '3.8'
-
 services:
-  php:
-    image: sammy266/mm-bk-php:latest
-    container_name: php
-    expose:
-      - "9000" # Expose port for PHP-FPM
-    depends_on:
-      - mysql
-    networks:
-      - app-network
-    # ...other settings
-
   nginx:
-    image: sammy266/mm-bk-nginx:latest
+    image: "${NGINX_PUSHED_IMG}"
     ports:
       - "${NGINX_HOST_HTTP_PORT}:80" # for web ui
       - "88:88" # for web api
@@ -24,10 +11,21 @@ services:
     depends_on:
       - php
       - mysql
-    # ...other settings
+
+  php:
+    image: "${PHP_PUSHED_IMG}"
+    container_name: php
+    environment:
+      - RUN_SEED=true
+    expose:
+      - "9000"
+    depends_on:
+      - mysql
+    networks:
+      - app-network
 
   mysql:
-    image: sammy266/mm-bk-mysql:latest
+    image: "${MYSQL_PUSHED_IMG}"
     environment:
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -40,10 +38,10 @@ services:
     container_name: mysql
     networks:
       - app-network
-    # ...other settings
+
 networks:
   app-network:
     driver: bridge
 
 volumes:
-  db_data: {}
+  db_data:

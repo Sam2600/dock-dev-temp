@@ -9,7 +9,7 @@ services:
     image: "${PRJ_NAME}/nginx:dev"
     container_name: nginx
     volumes:
-      - "./php/${PRJ_NAME}:${APP_CODE_PATH_CONTAINER}"
+      - "../:${APP_CODE_PATH_CONTAINER}"
       - "${NGINX_SITES_PATH}:/etc/nginx/conf.d"
     ports:
       - "${NGINX_HOST_HTTP_PORT}:80" # for web ui
@@ -37,7 +37,7 @@ services:
     expose:
       - "9000" # Expose port for PHP-FPM
     volumes:
-      - "./php/${PRJ_NAME}:${APP_CODE_PATH_CONTAINER}"
+      - "../:${APP_CODE_PATH_CONTAINER}"
     depends_on:
       - mysql
     networks:

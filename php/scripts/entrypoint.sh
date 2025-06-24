@@ -18,6 +18,7 @@ fi
 
 php artisan optimize:clear
 php artisan key:generate
+php artisan storage:link
 
 # Only run migrate:fresh --seed if explicitly enabled
 if [ "$RUN_SEED" = "true" ]; then

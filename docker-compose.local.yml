@@ -1,16 +1,16 @@
-version: "3.9"
-
+# docker-compose -f docker-compose.local.yml -p "your_prj_name" up --build
 services:
   nginx:
     build:
-      context: ./nginx/
-      dockerfile: Nginx.Dockerfile
+      context: ../
+      dockerfile: dock-dev-temp/nginx/Nginx.Dockerfile
       args:
         - NGINX_VERSION=${NGINX_VERSION}
+    image: "${PRJ_NAME}/nginx:dev"
     container_name: nginx
     volumes:
-      - "./php/${PRJ_NAME}:${APP_CODE_PATH_CONTAINER}"
-      - "${NGINX_SITES_PATH}:/etc/nginx/conf.d/"
+      - "../:${APP_CODE_PATH_CONTAINER}"
+      - "${NGINX_SITES_PATH}:/etc/nginx/conf.d"
     ports:
       - "${NGINX_HOST_HTTP_PORT}:80" # for web ui
       - "88:88" # for web api
@@ -23,20 +23,21 @@ services:
 
   php:
     build:
-      context: ./php/
-      dockerfile: PHP.Dockerfile
+      context: ../
+      dockerfile: dock-dev-temp/php/PHP.Dockerfile
       args:
         - PHP_SUFIX=${PHP_SUFIX}
         - PHP_VERSION=${PHP_VERSION}
         - WORKDIR=${APP_CODE_PATH_CONTAINER}
         - PRJ_NAME=${PRJ_NAME}
+    image: "${PRJ_NAME}/php:dev"
     container_name: php
     environment:
       - RUN_SEED=true
     expose:
       - "9000" # Expose port for PHP-FPM
     volumes:
-      - "./php/${PRJ_NAME}:${APP_CODE_PATH_CONTAINER}"
+      - "../:${APP_CODE_PATH_CONTAINER}"
     depends_on:
       - mysql
     networks:
@@ -48,6 +49,7 @@ services:
       dockerfile: MySQL.Dockerfile
       args:
         - MYSQL_VERSION=${MYSQL_VERSION}
+    image: "${PRJ_NAME}/mysql:dev"
     container_name: mysql
     environment:
       MYSQL_USER: ${MYSQL_USER}

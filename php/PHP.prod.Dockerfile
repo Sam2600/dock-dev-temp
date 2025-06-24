@@ -39,7 +39,7 @@ WORKDIR ${WORKDIR}
 
 # Copy your app code to the container and set permissions and ownership
 ARG PRJ_NAME=my-coding-project
-COPY --chown=wwwuser:wwwgroup ../.. .
+COPY --chown=wwwuser:wwwgroup . .
 
 # Switch to non-root user
 USER wwwuser

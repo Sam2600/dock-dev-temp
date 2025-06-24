@@ -16,7 +16,6 @@ else
    echo "Env file is found."
 fi
 
-php artisan optimize:clear
 php artisan key:generate
 php artisan storage:link
 
@@ -27,6 +26,8 @@ if [ "$RUN_SEED" = "true" ]; then
 else
    echo "Skipping migrations and seeding."
 fi
+
+php artisan optimize:clear
 
 # Run PHP-FPM in the foreground so the container stays alive
 exec php-fpm

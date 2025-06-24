@@ -1,11 +1,3 @@
-# Ignore everything inside php/
-php/*
-
-# But keep specific files (negate the ignore)
-!php/PHP.Dockerfile
-!php/PHP.prod.Dockerfile
-!php/scripts
-
 # (optional) Ignore other editor junk
 *.log
 *.swp

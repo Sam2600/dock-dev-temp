@@ -3,6 +3,7 @@
 set -e
 
 if [ ! -f "vendor/autoload.php" ]; then
+   # toggle --flags as needed, e.g., --no-dev for production but can off if dev dependencies are needed
    composer install --no-ansi --no-dev --no-interaction --no-plugins --no-progress --no-scripts --optimize-autoloader
    echo "Composer dependencies installed."
 else

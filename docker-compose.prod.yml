@@ -34,6 +34,9 @@ services:
     container_name: php
     environment:
       - RUN_SEED=true
+      - HEALTH_CHK=true
+      - HEALTH_SERVER=${HEALTH_SERVER}
+      - HEALTH_PORT=${HEALTH_PORT}
     expose:
       - "9000" # Expose port for PHP-FPM
     depends_on:

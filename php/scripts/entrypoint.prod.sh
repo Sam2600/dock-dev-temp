@@ -21,16 +21,21 @@ php artisan optimize:clear
 php artisan storage:link
 
 # Only run migrate:fresh --seed if explicitly enabled
-if [ "$RUN_SEED" = "true" ]; then
+if [ "$RUN_SEED" = "true" ] && [ "$HEALTH_CHK" = "true" ]; then
 
-   echo "Waiting for MySQL to be ready..."
+   if [ -z "$HEALTH_SERVER" ] || [ -z "$HEALTH_PORT" ]; then
+      echo "Error: HEALTH_SERVER and HEALTH_PORT environment variables must be set."
+      exit 1
+   fi
 
-   until nc -z -v -w30 mysql 3306; do
-      echo "⏳ Waiting for MySQL..."
+   echo "Waiting for Database Server to be ready..."
+
+   until nc -z -v -w30 "${HEALTH_SERVER}" "${HEALTH_PORT}"; do
+      echo "⏳ Waiting for Database Server..."
       sleep 3
    done
 
-   echo "✅ MySQL is ready! Continuing..."
+   echo "✅ Database Server is ready! Continuing..."
 
    echo "Running migrations and seeding the database..."
 

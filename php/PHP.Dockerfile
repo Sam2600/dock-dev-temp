@@ -5,6 +5,7 @@ FROM php:${PHP_VERSION}-${PHP_SUFFIX} as php
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
+        netcat \
         net-tools \
         libicu-dev \
         postgresql-client \

@@ -1,4 +1,4 @@
-# MM Book Store Backend
+# My Dock-dev-temp
 
 This repository contains the Docker setup and scripts for developing the Laravel project with PHP, Nginx, and MySQL or PostgreSQL.
 
